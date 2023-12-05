@@ -8,7 +8,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TrebuchetPart2UnfinishedApproach {
+public class Trebuchet2UnfinishedApproach {
 
     static String testinput = """
 onetwothreefourfivesixseveneightninezero

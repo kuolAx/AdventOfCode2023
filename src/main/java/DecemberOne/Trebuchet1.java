@@ -11,7 +11,7 @@ import java.util.Scanner;
 //split at each int and take first + last char -> faster?
 //regex searching and direct splitting to an Array
 
-public class TrebuchetPart1 {
+public class Trebuchet1 {
     public static void main(String[] args) {
 
         String content;
