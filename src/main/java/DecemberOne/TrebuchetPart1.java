@@ -12,7 +12,6 @@ import java.util.Scanner;
 //regex searching and direct splitting to an Array
 
 public class TrebuchetPart1 {
-
     public static void main(String[] args) {
 
         String content;

@@ -43,7 +43,16 @@ stzmqplr8gvmxblz
             Matcher matcher = pattern.matcher(currentLine);
             matcher.results().map(MatchResult::group)
                     .map( x -> { if ( !x.matches("\\d") ){
-                                    x = x.replace("one","1").replace("two","2").replace("three","3").replace("four","4").replace("five","5").replace("six","6").replace("seven","7").replace("eight","8").replace("nine","9").replace("zero","0");
+                                    x = x.replace("one","1")
+                                            .replace("two","2")
+                                            .replace("three","3")
+                                            .replace("four","4")
+                                            .replace("five","5")
+                                            .replace("six","6")
+                                            .replace("seven","7")
+                                            .replace("eight","8")
+                                            .replace("nine","9")
+                                            .replace("zero","0");
                                     }
                                  return x;} )
                     .forEach(currentLineNumbers::add);
@@ -75,7 +84,4 @@ stzmqplr8gvmxblz
         System.out.println( "Sum of all calibration values is: " + finalResult );
         scan.close();
     }
-
-
-
 }

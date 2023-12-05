@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TrebuchetPart2Better {
-
     public static void main(String[] args) {
 
         String content;
@@ -39,7 +38,16 @@ public class TrebuchetPart2Better {
             forwardsMatcher.results().map(MatchResult::group).findFirst()
                     .map(x -> {
                         if (!x.matches("\\d")) {
-                            x = x.replace("one", "1").replace("two", "2").replace("three", "3").replace("four", "4").replace("five", "5").replace("six", "6").replace("seven", "7").replace("eight", "8").replace("nine", "9").replace("zero", "0");
+                            x = x.replace("one", "1")
+                                    .replace("two", "2")
+                                    .replace("three", "3")
+                                    .replace("four", "4")
+                                    .replace("five", "5")
+                                    .replace("six", "6")
+                                    .replace("seven", "7")
+                                    .replace("eight", "8")
+                                    .replace("nine", "9")
+                                    .replace("zero", "0");
                         }
                         return x;
                     })
@@ -49,14 +57,20 @@ public class TrebuchetPart2Better {
             backwardsMatcher.results().map(MatchResult::group).findFirst()
                     .map(x -> {
                         if (!x.matches("\\d")) {
-                            x = x.replace("eno", "1").replace("owt", "2").replace("eerht", "3").replace("ruof", "4").replace("evif", "5").replace("xis", "6").replace("neves", "7").replace("thgie", "8").replace("enin", "9").replace("orez", "0");
+                            x = x.replace("eno", "1")
+                                    .replace("owt", "2")
+                                    .replace("eerht", "3")
+                                    .replace("ruof", "4")
+                                    .replace("evif", "5")
+                                    .replace("xis", "6")
+                                    .replace("neves", "7")
+                                    .replace("thgie", "8")
+                                    .replace("enin", "9")
+                                    .replace("orez", "0");
                         }
                         return x;
                     })
                     .map(currentLineNumbers::add);
-
-            currentLineNumbers.forEach(System.out::print);
-            System.out.println();
 
             System.out.print("Final Calibration number for this line: ");
             currentLineNumbers.forEach(System.out::print);
