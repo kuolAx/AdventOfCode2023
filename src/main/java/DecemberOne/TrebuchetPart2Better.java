@@ -12,13 +12,6 @@ import java.util.regex.Pattern;
 
 public class TrebuchetPart2Better {
 
-    static String testinput = """
-            onetwothreefourfivesixseveneightninezero
-            oneighthreefourfivesixseveninetwozero
-            mqtwoneight7sevenfourht
-            stzmqplr8gvmxblz
-            """;
-
     public static void main(String[] args) {
 
         String content;
