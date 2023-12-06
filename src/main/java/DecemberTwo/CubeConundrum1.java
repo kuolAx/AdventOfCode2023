@@ -3,9 +3,18 @@ package DecemberTwo;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class CubeConundrum1 {
+
+    static final int MAXNUMBEROFREDS = 12;
+    static final int MAXNUMBEROFGREENS = 13;
+    static final int MAXNUMBEROFBLUES = 14;
     public static void main(String[] args) {
 
         String testInput = """
@@ -21,7 +30,51 @@ public class CubeConundrum1 {
             throw new RuntimeException(e);
         }
 
-//        Stream.of(content.split("\\R")).map();
+        Pattern patternGameNumber = Pattern.compile("Game.(\\d+)");
+        Pattern patternRed = Pattern.compile("(\\d+).red");
+        Pattern patternGreen = Pattern.compile("(\\d+).green");
+        Pattern patternBlue = Pattern.compile("(\\d+).blue");
 
+        List<Integer> playableGamesList = new ArrayList<>();
+
+        Stream.of(content.split("\\n")).forEach( x -> {
+                                                          System.out.println("current line: " + x);
+                                                          Matcher matchRed = patternRed.matcher(x);
+                                                          Matcher matchGreen = patternGreen.matcher(x);
+                                                          Matcher matchBlue = patternBlue.matcher(x);
+
+                                                          Matcher matchGameNumber = patternGameNumber.matcher(x);
+
+                                                          if( isPlayableGame( matchRed, matchGreen, matchBlue ) )
+                                                              playableGamesList.add( Integer.parseInt( matchGameNumber.results().toList().get(0).group(1) ));
+                                                          });
+
+        System.out.println("Playable Games Sum: " + playableGamesList.stream().reduce(0, Integer::sum));
     }
+
+    public static boolean isPlayableGame(Matcher matchRed, Matcher matchGreen, Matcher matchBlue){
+        boolean isGamePlayable = true;
+
+        List<Integer> redNumbersList = matchRed.results().map(MatchResult::group).map(x -> Integer.parseInt(x.replaceAll("[^0-9]", ""))).toList();
+        isGamePlayable = listContainsNumberGreaterThan(isGamePlayable, redNumbersList, MAXNUMBEROFREDS);
+
+        List<Integer> greenNumbersList = matchGreen.results().map(MatchResult::group).map(x -> Integer.parseInt(x.replaceAll("[^0-9]", ""))).toList();
+        isGamePlayable = listContainsNumberGreaterThan(isGamePlayable, greenNumbersList, MAXNUMBEROFGREENS);
+
+        List<Integer> blueNumbersList = matchBlue.results().map(MatchResult::group).map(x -> Integer.parseInt(x.replaceAll("[^0-9]", ""))).toList();
+        isGamePlayable = listContainsNumberGreaterThan(isGamePlayable, blueNumbersList, MAXNUMBEROFBLUES);
+
+        return isGamePlayable;
+    }
+
+    private static boolean listContainsNumberGreaterThan(boolean isGamePlayable, List<Integer> colorNumbersList, int maxAmountOfColor) {
+        for (Integer numberOfColor : colorNumbersList) {
+            if (numberOfColor > maxAmountOfColor) {
+                isGamePlayable = false;
+                break;
+            }
+        }
+        return isGamePlayable;
+    }
+
 }
