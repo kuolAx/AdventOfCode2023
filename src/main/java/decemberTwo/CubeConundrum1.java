@@ -1,8 +1,6 @@
-package DecemberTwo;
+package decemberTwo;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.AdventHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.MatchResult;
@@ -23,12 +21,7 @@ public class CubeConundrum1 {
                            Game 3: 6 red, 15 blue, 15 green; 1 green, 4 red, 12 blue; 14 blue, 9 red, 1 green; 2 red, 15 blue, 12 green
                            """;
 
-        String content;
-        try {
-            content = Files.readString(Paths.get("./src/main/java/DecemberTwo/input.txt"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String content = AdventHelper.readFile("./src/main/java/DecemberTwo/input.txt");
 
         Pattern patternGameNumber = Pattern.compile("Game.(\\d+)");
         Pattern patternRed = Pattern.compile("(\\d+).red");

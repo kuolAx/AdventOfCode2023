@@ -1,8 +1,6 @@
-package DecemberThree;
+package decemberThree;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.AdventHelper;
 import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -24,12 +22,7 @@ public class GearRatios1 {
                 .664.598..
                 """;
 
-        String content;
-        try {
-            content = Files.readString(Paths.get("./src/main/java/DecemberThree/input.txt"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String content = AdventHelper.readFile("./src/main/java/DecemberThree/input.txt");
 
         Pattern patternSymbols = Pattern.compile("[@!§&%$+\\-/=#*]");
         Pattern patternNumbers = Pattern.compile("\\d+");

@@ -1,4 +1,4 @@
-package DecemberOne;
+package decemberOne;
 
 import java.io.IOException;
 import java.nio.file.Files;

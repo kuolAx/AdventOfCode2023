@@ -1,8 +1,6 @@
-package DecemberOne;
+package decemberOne;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.AdventHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -13,12 +11,7 @@ import java.util.regex.Pattern;
 public class Trebuchet2Better {
     public static void main(String[] args) {
 
-        String content;
-        try {
-            content = Files.readString(Paths.get("./src/main/java/DecemberOne/input.txt"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String content = AdventHelper.readFile("./src/main/java/DecemberOne/input.txt");
 
         Scanner scan = new Scanner(content);
         String currentLine;

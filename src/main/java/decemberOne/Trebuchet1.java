@@ -1,25 +1,12 @@
-package DecemberOne;
+package decemberOne;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import utils.AdventHelper;
 import java.util.Scanner;
-
-//My Alternative Ideas:
-//CharacterIterator characterIterator = new StringCharacterIterator(currentLine);
-//stream with lambda
-//split at each int and take first + last char -> faster?
-//regex searching and direct splitting to an Array
 
 public class Trebuchet1 {
     public static void main(String[] args) {
 
-        String content;
-        try {
-            content = Files.readString(Paths.get("./src/main/java/DecemberOne/input.txt"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        String content = AdventHelper.readFile("./src/main/java/DecemberOne/input.txt");
 
         Scanner scan = new Scanner(content);
         String currentLine;
