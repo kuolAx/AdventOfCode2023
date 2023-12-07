@@ -1,4 +1,4 @@
-package decemberThree;
+package december3;
 
 import utils.AdventHelper;
 import java.util.*;
@@ -22,7 +22,7 @@ public class GearRatios1 {
                 .664.598..
                 """;
 
-        String content = AdventHelper.readFile("./src/main/java/DecemberThree/input.txt");
+        String content = AdventHelper.readFile("./src/main/java/december3/input.txt");
 
         Pattern patternSymbols = Pattern.compile("[@!§&%$+\\-/=#*]");
         Pattern patternNumbers = Pattern.compile("\\d+");

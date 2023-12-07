@@ -1,4 +1,4 @@
-package decemberOne;
+package december1;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +21,7 @@ stzmqplr8gvmxblz
 
         String content;
         try {
-            content = Files.readString(Paths.get("./src/main/java/DecemberOne/input.txt"));
+            content = Files.readString(Paths.get("./src/main/java/december1/input.txt"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

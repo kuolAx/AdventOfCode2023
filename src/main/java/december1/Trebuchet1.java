@@ -1,4 +1,4 @@
-package decemberOne;
+package december1;
 
 import utils.AdventHelper;
 import java.util.Scanner;
@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Trebuchet1 {
     public static void main(String[] args) {
 
-        String content = AdventHelper.readFile("./src/main/java/DecemberOne/input.txt");
+        String content = AdventHelper.readFile("./src/main/java/december1/input.txt");
 
         Scanner scan = new Scanner(content);
         String currentLine;

@@ -1,4 +1,4 @@
-package decemberThree;
+package december3;
 
 import utils.AdventHelper;
 import java.util.*;
@@ -22,7 +22,7 @@ public class GearRatios2 {
 
     public static void main(String[] args) {
 
-        String content = AdventHelper.readFile("./src/main/java/DecemberThree/input.txt");
+        String content = AdventHelper.readFile("./src/main/java/december3/input.txt");
 
         List<String> schematicLines = Arrays.asList( content.split("\\n") );
         int currentLine = 1;

@@ -1,4 +1,4 @@
-package decemberTwo;
+package december2;
 
 import utils.AdventHelper;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ public class CubeConundrum1 {
                            Game 3: 6 red, 15 blue, 15 green; 1 green, 4 red, 12 blue; 14 blue, 9 red, 1 green; 2 red, 15 blue, 12 green
                            """;
 
-        String content = AdventHelper.readFile("./src/main/java/DecemberTwo/input.txt");
+        String content = AdventHelper.readFile("./src/main/java/december2/input.txt");
 
         Pattern patternGameNumber = Pattern.compile("Game.(\\d+)");
         Pattern patternRed = Pattern.compile("(\\d+).red");

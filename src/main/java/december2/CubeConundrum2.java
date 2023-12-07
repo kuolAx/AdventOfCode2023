@@ -1,4 +1,4 @@
-package decemberTwo;
+package december2;
 
 import utils.AdventHelper;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public class CubeConundrum2 {
     public static void main(String[] args) {
 
-        String content = AdventHelper.readFile("./src/main/java/DecemberTwo/input.txt");
+        String content = AdventHelper.readFile("./src/main/java/december2/input.txt");
 
         Pattern patternRed = Pattern.compile("(\\d+).red");
         Pattern patternGreen = Pattern.compile("(\\d+).green");
