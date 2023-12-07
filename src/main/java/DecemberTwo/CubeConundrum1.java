@@ -25,7 +25,7 @@ public class CubeConundrum1 {
 
         String content;
         try {
-            content = Files.readString(Paths.get("./src/main/java/DecemberTwo/Input.txt"));
+            content = Files.readString(Paths.get("./src/main/java/DecemberTwo/input.txt"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

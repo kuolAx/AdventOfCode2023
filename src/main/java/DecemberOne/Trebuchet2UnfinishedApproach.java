@@ -21,7 +21,7 @@ stzmqplr8gvmxblz
 
         String content;
         try {
-            content = Files.readString(Paths.get("./src/main/java/DecemberOne/Input.txt"));
+            content = Files.readString(Paths.get("./src/main/java/DecemberOne/input.txt"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
