@@ -40,7 +40,7 @@ public class GearRatios1 {
         //Map -> { lineNumber : List( [startIndex, endIndex], [startIndex, endIndex], ...) }
         HashMap<Integer, List<int[]>> numberStartAndEndIndexMap = new HashMap<>();
 
-        List<String> schematicLines = new ArrayList<>( Arrays.asList(content.split("\\n")) );
+        List<String> schematicLines = Arrays.asList(content.split( "\\n" ));
         int currentLine = 1;
 
         //extract indices of symbols and numbers
