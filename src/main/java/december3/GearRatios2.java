@@ -40,8 +40,8 @@ public class GearRatios2 {
 
         String content = AdventHelper.readFile("./src/main/java/december3/input.txt");
 
-//        schematicLines = Arrays.asList( content.split("\\n") );
-        schematicLines = Arrays.asList( testinput.split("\\n") );
+        schematicLines = Arrays.asList( content.split("\\n") );
+//        schematicLines = Arrays.asList( testinput.split("\\n") );
 
         //extract indices of star-symbols and numbers, then map to lineNumber
         for (int i = 0; i < schematicLines.size(); i++) {
@@ -49,8 +49,8 @@ public class GearRatios2 {
             int currentLineNumber = i+1;
 
             //fill stars indices Map
-            Matcher matchStars = PATTERN_STAR_SYMBOL.matcher(schematicLine);
-            starIndices.put( currentLineNumber , matchStars.results().map(MatchResult::start).toList() );
+            Matcher matchStars = PATTERN_STAR_SYMBOL.matcher( schematicLine );
+            starIndices.put( currentLineNumber, matchStars.results().map(MatchResult::start).toList() );
 
             //if no stars are present in the current line -> put an empty list to indicate "no stars found"
             if (starIndices.getOrDefault( currentLineNumber, List.of()).isEmpty() )
@@ -58,28 +58,28 @@ public class GearRatios2 {
 
             //fill numbers indices Map
             Matcher matchNumbers = PATTERN_NUMBERS.matcher(schematicLine);
-            numberStartAndEndIndexMap.put( currentLineNumber, matchNumbers.results().map(x -> new int[]{x.start(), x.end()}).toList());
+            numberStartAndEndIndexMap.put( currentLineNumber, matchNumbers.results().map(x -> new int[]{x.start(), x.end()}).toList() );
         }
 
         //level: lineNumber
-        for (int lineNumber = 1; lineNumber <= schematicLines.size(); lineNumber++) {
-            System.out.print( "current line: " + lineNumber + " " );
+        for (int line = 1; line <= schematicLines.size(); line++) {
+            System.out.print( "current line: " + line + " " );
 
             //level: value of Map (List<int[]>) -> "loop through every number (int[]) found in the line we are looking at"
-            for (int j = 0; j < numberStartAndEndIndexMap.get(lineNumber).size(); j++) {
-                System.out.print( Arrays.toString(numberStartAndEndIndexMap.get(lineNumber).get(j) ));
+            for (int j = 0; j < numberStartAndEndIndexMap.get(line).size(); j++) {
+                System.out.print( Arrays.toString(numberStartAndEndIndexMap.get(line).get(j)) );
 
                 //int[v1,v2] - always has 2 values
-                int[] currentNumberStartEndIndex = numberStartAndEndIndexMap.get(lineNumber).get(j);
+                int[] currentNumberStartEndIndex = numberStartAndEndIndexMap.get(line).get(j);
 
-                //prepare list with all indices to look at for symbols in the line above,same,below.
+                //prepare list with all indices to look at for symbols in the line above,same,below
                 Set<Integer> indicesToCheck = retrieveSearchIndexList( currentNumberStartEndIndex );
 
                 //fill Map<star-id, adjacentNumbers> for the current line
-                compareStarIndicesWithNumberIndices( lineNumber, indicesToCheck, currentNumberStartEndIndex );
+                compareStarIndicesWithNumberIndices( line, indicesToCheck, currentNumberStartEndIndex );
             }
             System.out.println();
-            System.out.println("currentMap: " + starIDToAdjacentNumbersMap);
+            System.out.println( "currentMap: " + starIDToAdjacentNumbersMap );
         }
 
         List<Integer> gearRatioList = new ArrayList<>();
@@ -123,11 +123,10 @@ public class GearRatios2 {
                 if (indicesToCheck.contains(starIndex)) {
 
                     //Map.put( Integer, List<Integer>)
-                    starIDToAdjacentNumbersMap
-                            .computeIfPresent( starID, (key, value) -> {
-                                                                        value.add( Integer.valueOf( schematicLines.get(line-1).substring( currentNumberStartEndIndex[0], currentNumberStartEndIndex[1] )));
-                                                                        return value;
-                                                                });
+                    starIDToAdjacentNumbersMap.computeIfPresent( starID, (key, value) -> {
+
+                        value.add( Integer.valueOf( schematicLines.get(line-1).substring( currentNumberStartEndIndex[0], currentNumberStartEndIndex[1] )));
+                        return value;});
                 }
             }
         }
