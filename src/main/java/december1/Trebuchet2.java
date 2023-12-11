@@ -8,7 +8,7 @@ import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Trebuchet2Better {
+public class Trebuchet2 {
     public static void main(String[] args) {
 
         String content = AdventHelper.readFile("./src/main/java/december1/input.txt");
