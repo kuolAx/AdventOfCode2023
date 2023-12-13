@@ -1,5 +1,6 @@
 package december5;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -8,16 +9,18 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 
 public class Fertilizer2 {
     public static void main( String[] args ) {
 
-        List<Long> seedNumbers = Arrays.stream( (content.split("\n"))[0].replace("seeds: ","").trim().split(" ") ).map(Long::valueOf).toList();
-        System.out.println( "Seed numbers to check: " + seedNumbers );
+        List<Long> seedNumbersAndRange = Arrays.stream( (testinput.split("\n"))[0].replace("seeds: ","").trim().split(" ") ).map(Long::valueOf).toList();
+
+        System.out.println( "Seed numbers with range to check: " + seedNumbersAndRange );
 
         Map<Integer, Long> transformedSeedValues;
 
-        transformedSeedValues = computeInputTextAndReturnTransformedValues( seedNumbers, "(?:seed-to-soil map:\n)(.+)(?:soil-to-fertilizer map)");
+        transformedSeedValues = computeInputTextAndReturnTransformedValues( seedNumbersAndRange, "(?:seed-to-soil map:\n)(.+)(?:soil-to-fertilizer map)");
         transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:soil-to-fertilizer map:\\n)(.+)(?:fertilizer-to-water map)");
         transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:fertilizer-to-water map:\n)(.+)(?:water-to-light map)");
         transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:water-to-light map:\n)(.+)(?:light-to-temperature map)");
@@ -27,9 +30,27 @@ public class Fertilizer2 {
 
         System.out.println( "Nearest location for given seed numbers: " + Collections.min( transformedSeedValues.values() ) );
     }
+
+//    private static List<Long> craftSeedNumbersList(List<Long> initialValues) {
+//        System.out.println("initialValues: " + initialValues);
+//        List<Long> seedNumbers = new ArrayList<>();
+//
+//        for (int i = 0; i < initialValues.size(); i++) {
+//            if( i%2 == 0 ) {
+//              long start = initialValues.get(i);
+//                long range = initialValues.get(i+1);
+//                LongStream.range( start, start+range ).forEach(seedNumbers::add);
+//            }
+//        }
+//
+//        System.out.println(seedNumbers);
+//        System.out.println("size: " + seedNumbers.size());
+//        return seedNumbers;
+//    }
+
     public static Map<Integer, Long> computeInputTextAndReturnTransformedValues(Map<Integer, Long> seedValues, String regex){
-        List<Long> seedNumbers = seedValues.values().stream().toList();
-        return computeInputTextAndReturnTransformedValues(seedNumbers, regex);
+        List<Long> seedNumbersAndRange = seedValues.values().stream().toList();
+        return computeInputTextAndReturnTransformedValues(seedNumbersAndRange, regex);
     }
     public static Map<Integer, Long> computeInputTextAndReturnTransformedValues(List<Long> seedNumbers, String regex ){
 
@@ -37,7 +58,7 @@ public class Fertilizer2 {
 
         //extract relevant numbers from puzzle input using given regex - DOTALL flag -> "." also matches newlines
         Pattern pattern = Pattern.compile( regex, Pattern.DOTALL );
-        Matcher matcher = pattern.matcher( content );
+        Matcher matcher = pattern.matcher( testinput );
 
         String[] numberLines;
 
@@ -62,11 +83,62 @@ public class Fertilizer2 {
                 }
             }
         }
+//        for ( String numberLine : numberLines ) {
+//            List<Long> currentNumbers = Arrays.stream( numberLine.trim().split(" ") ).map(Long::valueOf).toList();
+//
+//            long destinationStartNumber = currentNumbers.get(0);
+//            long sourceStartNumber = currentNumbers.get(1);
+//            long range = currentNumbers.get(2);
+//
+//            for (int i = 0; i < seedNumbers.size(); i++) {
+//
+//                long seedNumber = seedNumbers.get(i);
+//
+//                if( seedNumber >= sourceStartNumber && seedNumber < (sourceStartNumber + range) ) {
+//                    //compute transformed seed number
+//                    //computeIfAbsent -> because no value can be transformed more than onc per step and this protects it from being altered more than once
+//                    transformedSeedNumbers.computeIfAbsent(i, x -> destinationStartNumber + ( seedNumber-sourceStartNumber ));
+//                }
+//            }
+//        }
 
         IntStream.range(0, seedNumbers.size() ).forEach( x -> transformedSeedNumbers.computeIfAbsent(x, value -> seedNumbers.get(x) ));
         return transformedSeedNumbers;
     }
-
+    static String testinput = """
+            seeds: 79 14 55 13
+                        
+            seed-to-soil map:
+            50 98 2
+            52 50 48
+                        
+            soil-to-fertilizer map:
+            0 15 37
+            37 52 2
+            39 0 15
+                        
+            fertilizer-to-water map:
+            49 53 8
+            0 11 42
+            42 0 7
+            57 7 4
+                        
+            water-to-light map:
+            88 18 7
+            18 25 70
+                        
+            light-to-temperature map:
+            45 77 23
+            81 45 19
+            68 64 13
+                        
+            temperature-to-humidity map:
+            0 69 1
+            1 0 69
+                        
+            humidity-to-location map:
+            60 56 37
+            56 93 4""";
     static String content = """
             seeds: 3640772818 104094365 1236480411 161072229 376099792 370219099 1590268366 273715765 3224333694 68979978 2070154278 189826014 3855332650 230434913 3033760782 82305885 837883389 177854788 2442602612 571881366
                         
