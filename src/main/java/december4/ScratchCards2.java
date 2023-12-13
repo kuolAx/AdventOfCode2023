@@ -2,7 +2,6 @@ package december4;
 
 import utils.AdventHelper;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -67,7 +66,8 @@ public class ScratchCards2 {
             List<Integer> winningNumbersCount = map.get(i);
 
             //has to be looped for every copy of the card currently existing
-            for (int j = 0; j < map.get(i).get(1); j++) {
+            Integer amountOfCardCopies = map.get(i).get(1);
+            for (int j = 0; j < amountOfCardCopies; j++) {
 
                 //has to be looped for the amount of winning numbers to increment following cards
                 for (int k = 1; k < winningNumbersCount.get(0) + 1; k++) {
@@ -84,14 +84,13 @@ public class ScratchCards2 {
         return map.values().stream().map( v -> v.get(1) ).reduce(0, Integer::sum);
     }
 
-    //increase number of copies of given card by 1
-    private static List<Integer> incrementCardCopiesAmount(List<Integer> amountList){
+    private static List<Integer> incrementCardCopiesAmount(List<Integer> winningNumbersAndCardCopiesList){
 
-        Integer cardCopies = amountList.get(1);
+        Integer cardCopies = winningNumbersAndCardCopiesList.get(1);
         cardCopies++;
-        amountList.set(1,cardCopies);
+        winningNumbersAndCardCopiesList.set(1,cardCopies);
 
-        return amountList;
+        return winningNumbersAndCardCopiesList;
     }
 
 }

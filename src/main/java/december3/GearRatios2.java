@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 
 public class GearRatios2 {
 
-    private static final Pattern PATTERN_STAR_SYMBOL = Pattern.compile("[*]");
+    private static final Pattern PATTERN_STAR_SYMBOL = Pattern.compile("\\*");
     private static final Pattern PATTERN_NUMBERS = Pattern.compile("\\d+");
 
     //Map -> { lineNumber : List( IndexOfStar1, IndexOfStar2, ...) }
@@ -24,24 +24,20 @@ public class GearRatios2 {
     public static void main(String[] args) {
 
         String testinput = """
-                467..114.3
-                ...*....*.
+                467..114..
+                .*........
                 ..35..633.
-                ......#2..
-                617*.....3
-                .....+.58*
+                ......#...
+                617*......
+                .....+.58.
                 ..592.....
-                ..-...755.
-                ...$.*...2
-                .664.598.*
-                ..........
-                .......*..
-                """;
+                ......755.
+                ...$....*.
+                .664.598..""";
 
         String content = AdventHelper.readFile("./src/main/java/december3/input.txt");
 
         schematicLines = Arrays.asList( content.split("\\n") );
-//        schematicLines = Arrays.asList( testinput.split("\\n") );
 
         //extract indices of star-symbols and numbers, then map to lineNumber
         for (int i = 0; i < schematicLines.size(); i++) {
@@ -63,17 +59,19 @@ public class GearRatios2 {
 
         //level: lineNumber
         for (int line = 1; line <= schematicLines.size(); line++) {
-            System.out.print( "current line: " + line + " " );
+            System.out.println( "current line: " + line + " " );
 
             //level: value of Map (List<int[]>) -> "loop through every number (int[]) found in the line we are looking at"
             for (int j = 0; j < numberStartAndEndIndexMap.get(line).size(); j++) {
-                System.out.print( Arrays.toString(numberStartAndEndIndexMap.get(line).get(j)) );
 
-                //int[v1,v2] - always has 2 values
+                //int[v1,v2] - always has 2 values - numberStartIndex, numberEndIndex
                 int[] currentNumberStartEndIndex = numberStartAndEndIndexMap.get(line).get(j);
+                System.out.print( Arrays.toString( currentNumberStartEndIndex ) );
 
                 //prepare list with all indices to look at for symbols in the line above,same,below
                 Set<Integer> indicesToCheck = retrieveSearchIndexList( currentNumberStartEndIndex );
+                System.out.println();
+                System.out.println("indicesToCheck: " + indicesToCheck);
 
                 //fill Map<star-id, adjacentNumbers> for the current line
                 compareStarIndicesWithNumberIndices( line, indicesToCheck, currentNumberStartEndIndex );
@@ -85,8 +83,12 @@ public class GearRatios2 {
         List<Integer> gearRatioList = new ArrayList<>();
 
         //extract star symbols with EXACTLY 2 adjacent numbers. Then multiply those 2 numbers for the resulting gear ratio
-        starIDToAdjacentNumbersMap.forEach( (k, v) -> { if( v.size() == 2 )
-                                                            gearRatioList.add(v.stream().reduce(1, Math::multiplyExact)); });
+        starIDToAdjacentNumbersMap
+                .values()
+                .stream()
+                .filter(valueList -> valueList.size() == 2)
+                .forEach( valueList -> gearRatioList.add( valueList.get(0) * valueList.get(1) ));
+
         int gearRatioSum = gearRatioList.stream().reduce(0,Integer::sum);
 
         System.out.println();
@@ -109,24 +111,21 @@ public class GearRatios2 {
         return indicesToCheck;
     }
 
-    private static void compareStarIndicesWithNumberIndices(int line, Set<Integer> indicesToCheck, int[] currentNumberStartEndIndex) {
+    private static void compareStarIndicesWithNumberIndices(int line, Set<Integer> indicesToCheck, int[] currentNumberBounds) {
         //do for previous, current, and next line
-        for (int currentLine = line-1; currentLine < line+2; currentLine++) {
+        for (int currentLine = line-1; currentLine <= line+1; currentLine++) {
 
             //do for every star-symbol found in the current line being looked at
             for (Integer starIndex : starIndices.getOrDefault( currentLine, List.of() )) {
 
-                Integer starID = Integer.valueOf(currentLine + "" + starIndex);
-
-                starIDToAdjacentNumbersMap.computeIfAbsent( starID, x -> new ArrayList<>());
-
                 if (indicesToCheck.contains(starIndex)) {
 
-                    //Map.put( Integer, List<Integer>)
-                    starIDToAdjacentNumbersMap.computeIfPresent( starID, (key, value) -> {
+                    Integer starID = Integer.valueOf(currentLine + "" + starIndex);
+                    starIDToAdjacentNumbersMap.computeIfAbsent( starID, x -> new ArrayList<>());
+                    Integer currentNumber = Integer.valueOf(schematicLines.get(line - 1).substring(currentNumberBounds[0], currentNumberBounds[1]));
 
-                        value.add( Integer.valueOf( schematicLines.get(line-1).substring( currentNumberStartEndIndex[0], currentNumberStartEndIndex[1] )));
-                        return value;});
+                    //Map.put( Integer, List<Integer>)
+                    starIDToAdjacentNumbersMap.computeIfPresent( starID, (key, valueList) -> { valueList.add(currentNumber); return valueList; });
                 }
             }
         }
