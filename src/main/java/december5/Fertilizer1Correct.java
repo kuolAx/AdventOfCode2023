@@ -9,8 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
-public class Fertilizer2 {
-    public static void main( String[] args ) {
+public class Fertilizer1Correct {
+public static void main( String[] args ) {
 
         List<Long> seedNumbers = Arrays.stream( (content.split("\n"))[0].replace("seeds: ","").trim().split(" ") ).map(Long::valueOf).toList();
         System.out.println( "Seed numbers to check: " + seedNumbers );

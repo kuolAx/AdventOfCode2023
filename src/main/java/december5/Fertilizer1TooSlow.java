@@ -1,7 +1,5 @@
 package december5;
 
-import utils.AdventHelper;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.LongStream;
 
-public class Fertilizer1 {
+public class Fertilizer1TooSlow {
 
     private static Map<Long, Long> seedToSoilMap;
     private static Map<Long, Long> soilToFertilizerMap;
@@ -95,42 +93,6 @@ public class Fertilizer1 {
         System.out.println("locationNumbersList: " + locationNumbers);
         return Collections.min(locationNumbers);
     }
-
-    static String testInput = """
-                seeds: 79 14 55 13
-                                
-                seed-to-soil map:
-                50 98 2
-                52 50 48
-                                
-                soil-to-fertilizer map:
-                0 15 37
-                37 52 2
-                39 0 15
-                                
-                fertilizer-to-water map:
-                49 53 8
-                0 11 42
-                42 0 7
-                57 7 4
-                                
-                water-to-light map:
-                88 18 7
-                18 25 70
-                                
-                light-to-temperature map:
-                45 77 23
-                81 45 19
-                68 64 13
-                                
-                temperature-to-humidity map:
-                0 69 1
-                1 0 69
-                                
-                humidity-to-location map:
-                60 56 37
-                56 93 4""";
-
     static String content = """
             seeds: 3640772818 104094365 1236480411 161072229 376099792 370219099 1590268366 273715765 3224333694 68979978 2070154278 189826014 3855332650 230434913 3033760782 82305885 837883389 177854788 2442602612 571881366
                         
