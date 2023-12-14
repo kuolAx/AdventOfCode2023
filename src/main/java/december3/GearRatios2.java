@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class GearRatios2 {
 
@@ -76,8 +77,6 @@ public class GearRatios2 {
                 //fill Map<star-id, adjacentNumbers> for the current line
                 compareStarIndicesWithNumberIndices( line, indicesToCheck, currentNumberStartEndIndex );
             }
-            System.out.println();
-            System.out.println( "currentMap: " + starIDToAdjacentNumbersMap );
         }
 
         List<Integer> gearRatioList = new ArrayList<>();
@@ -87,11 +86,12 @@ public class GearRatios2 {
                 .values()
                 .stream()
                 .filter(valueList -> valueList.size() == 2)
-                .forEach( valueList -> gearRatioList.add( valueList.get(0) * valueList.get(1) ));
+                .forEach( valueList -> gearRatioList.add( (valueList.get(0) * valueList.get(1)) ));
 
         int gearRatioSum = gearRatioList.stream().reduce(0,Integer::sum);
 
         System.out.println();
+        System.out.println("current map " + starIDToAdjacentNumbersMap);
         System.out.println("Sum of gear ratios: " + gearRatioSum);
     }
 
@@ -120,7 +120,8 @@ public class GearRatios2 {
 
                 if (indicesToCheck.contains(starIndex)) {
 
-                    Integer starID = Integer.valueOf(currentLine + "" + starIndex);
+                    //with a "0" in between to remove ambiguity of e.g.: line 5 index 57 (557) and line 55 index 7 (557) -> (5057) and (5507)
+                    Integer starID = Integer.valueOf(currentLine + "0" + starIndex);
                     starIDToAdjacentNumbersMap.computeIfAbsent( starID, x -> new ArrayList<>());
                     Integer currentNumber = Integer.valueOf(schematicLines.get(line - 1).substring(currentNumberBounds[0], currentNumberBounds[1]));
 
