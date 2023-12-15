@@ -54,10 +54,12 @@ public class Fertilizer2 {
 
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+
+        //to hold already transformed values while iterating through different alterations
         Map<Integer, long[]> newRangesMap = new HashMap<>();
+
+        //copy to create a modifiable map
         Map<Integer, long[]> seedRangez = new HashMap<>(seedRanges);
-        int initialSize = seedRangez.size();
-        int count = 0;
 
         //extract relevant numbers from puzzle input using given regex - DOTALL flag -> "." also matches newlines
         Pattern pattern = Pattern.compile( regex, Pattern.DOTALL );
@@ -67,7 +69,7 @@ public class Fertilizer2 {
 
         numberLines = matcher.find() ? ( matcher.group(1).split("\n") ) : ( new String[] {} );
 
-        //work through each line of numbers and see if given seedNumber needs to be transformed
+        //work through each line of numbers and see if given seedRanges need to be transformed
         for ( String numberLine : numberLines ) {
             List<Long> currentNumbers = Arrays.stream( numberLine.trim().split(" ") ).map(Long::valueOf).toList();
 
@@ -76,22 +78,21 @@ public class Fertilizer2 {
             long range = currentNumbers.get(2);
             long sourceEndNumber = sourceStartNumber + range - 1;
             long destinationEndNumber = destinationStartNumber + range - 1;
-
             long modifier = destinationStartNumber - sourceStartNumber;
 
             //logging
-            {
-                System.out.print("ranges before transformation: ");
-                seedRangez.values().forEach(x -> System.out.print(Arrays.toString(x)));
-                System.out.println();
-                System.out.print("current numbers: " + currentNumbers);
-                System.out.println(" range: " + sourceStartNumber + "-" + sourceEndNumber + " destination: " + destinationStartNumber + "-" + destinationEndNumber);
-                System.out.println("modifier: " + modifier);
-            }
+            System.out.print("ranges before transformation: ");
+            seedRangez.values().forEach(x -> System.out.print(Arrays.toString(x)));
+            System.out.println();
+            System.out.print("current numbers: " + currentNumbers);
+            System.out.println(" range: " + sourceStartNumber + "-" + sourceEndNumber + " destination: " + destinationStartNumber + "-" + destinationEndNumber);
+            System.out.println("modifier: " + modifier);
 
+            //for each range entry [rangeStart, rangeEnd]
             for (int i = 0; i < seedRangez.keySet().stream().mapToInt(key -> key).max().orElseGet(() -> 0) + 1; i++) {
 
                 if ( seedRangez.get(i) != null ) {
+
                     long[] seedRange = seedRangez.get(i);
 
                     //e.g.: [70, 92]
@@ -104,12 +105,10 @@ public class Fertilizer2 {
                     long overlapEnd     = Math.min( seedRangeEnd, sourceEndNumber );
 
                     boolean overlapExists = overlapStart <= overlapEnd;
-                    System.out.println("overlap: " + overlapStart + " : " + overlapEnd + " -> " + overlapExists);
 
-//                    int newMapKey = newRangesMap.keySet().stream().mapToInt(key -> key).max().orElseGet(() -> 0) + 1;
-                    int initalMapKey = seedRangez.keySet().stream().mapToInt(key -> key).max().orElseGet(() -> 0) + 1;
+                    int addToEndOfMap = seedRangez.keySet().stream().mapToInt(key -> key).max().orElseGet(() -> 0) + 1;
 
-                    //if overlap exists: create transformed rangeValues for given numbers AND put non overlapping ranges at the back of map
+                    //if overlap exists: create transformed rangeValues for given numbers AND put non overlapping ranges at the back of map for re-check
                     if( overlapExists ){
 
                         seedRange[0] = overlapStart + modifier;
@@ -123,12 +122,13 @@ public class Fertilizer2 {
                         boolean remapAfterOverlapNeeded = seedRangeEnd > overlapEnd;
 
                         if( remapBeforeOverlapNeeded )
-                            seedRangez.put( initalMapKey, new long[] { seedRangeStart, (overlapStart - 1) } );
+                            seedRangez.put( addToEndOfMap, new long[] { seedRangeStart, (overlapStart - 1) } );
+
                         if( remapAfterOverlapNeeded ) {
-                            initalMapKey = remapBeforeOverlapNeeded ? initalMapKey + 1  : initalMapKey;
-                            seedRangez.put( initalMapKey, new long[]{ (overlapEnd + 1 ), seedRangeEnd });
+                            addToEndOfMap = remapBeforeOverlapNeeded ? addToEndOfMap + 1  : addToEndOfMap;
+                            seedRangez.put( addToEndOfMap, new long[]{ (overlapEnd + 1 ), seedRangeEnd });
                         }
-    //                    if( sourceStartNumber < seedRangeStart && sourceEndNumber > seedRangeEnd) -> I think its handled above
+
                     } else { newRangesMap.put(i, seedRange); }
                 }
             }
@@ -138,8 +138,6 @@ public class Fertilizer2 {
             System.out.println();
             System.out.println("------------------------------------------------------------");
         }
-
-
 
         return newRangesMap;
     }
