@@ -12,7 +12,7 @@ public class Fertilizer2 {
     static int count;
     public static void main(String[] args) {
 
-        List<Long> seedNumbers = Arrays.stream((testinput.split("\n"))[0].replace("seeds: ", "").trim().split(" ")).map(Long::valueOf).toList();
+        List<Long> seedNumbers = Arrays.stream((content.split("\n"))[0].replace("seeds: ", "").trim().split(" ")).map(Long::valueOf).toList();
 
         Map<Integer, long[]> seedRanges = craftSeedNumbersWithUpperBoundsList(seedNumbers);
 //        seedRanges = Map.of(0,new long[]{82,82});
@@ -61,7 +61,7 @@ public class Fertilizer2 {
 
         //extract relevant numbers from puzzle input using given regex - DOTALL flag -> "." also matches newlines
         Pattern pattern = Pattern.compile( regex, Pattern.DOTALL );
-        Matcher matcher = pattern.matcher( testinput );
+        Matcher matcher = pattern.matcher( content );
 
         String[] numberLines;
 
@@ -89,7 +89,7 @@ public class Fertilizer2 {
                 System.out.println("modifier: " + modifier);
             }
 
-            for (int i = 0; i < initialSize; i++) {
+            for (int i = 0; i < seedRangez.keySet().stream().mapToInt(key -> key).max().orElseGet(() -> 0) + 1; i++) {
 
                 if ( seedRangez.get(i) != null ) {
                     long[] seedRange = seedRangez.get(i);
