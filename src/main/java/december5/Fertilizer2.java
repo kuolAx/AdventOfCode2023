@@ -1,60 +1,56 @@
 package december5;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
 
 public class Fertilizer2 {
-    public static void main( String[] args ) {
 
-        List<Long> seedNumbersAndRange = Arrays.stream( (testinput.split("\n"))[0].replace("seeds: ","").trim().split(" ") ).map(Long::valueOf).toList();
+    static int count;
+    public static void main(String[] args) {
 
-        System.out.println( "Seed numbers with range to check: " + seedNumbersAndRange );
+        List<Long> seedNumbers = Arrays.stream((testinput.split("\n"))[0].replace("seeds: ", "").trim().split(" ")).map(Long::valueOf).toList();
 
-        Map<Integer, Long> transformedSeedValues;
+        Map<Integer, long[]> seedRanges = craftSeedNumbersWithUpperBoundsList(seedNumbers);
+        System.out.println("seed numbers: " + seedNumbers);
+        System.out.print("seed ranges: ");
+        seedRanges.values().forEach( x -> System.out.print( Arrays.toString(x) ));
 
-        transformedSeedValues = computeInputTextAndReturnTransformedValues( seedNumbersAndRange, "(?:seed-to-soil map:\n)(.+)(?:soil-to-fertilizer map)");
-        transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:soil-to-fertilizer map:\\n)(.+)(?:fertilizer-to-water map)");
-        transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:fertilizer-to-water map:\n)(.+)(?:water-to-light map)");
-        transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:water-to-light map:\n)(.+)(?:light-to-temperature map)");
-        transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:light-to-temperature map:\n)(.+)(?:temperature-to-humidity map)");
-        transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:temperature-to-humidity map:\n)(.+)(?:humidity-to-location map)");
-        transformedSeedValues = computeInputTextAndReturnTransformedValues( transformedSeedValues, "(?:humidity-to-location map:\n)(.+)$");
+        seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:seed-to-soil map:\n)(.+)(?:soil-to-fertilizer map)");
+        seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:soil-to-fertilizer map:\\n)(.+)(?:fertilizer-to-water map)");
+        seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:fertilizer-to-water map:\n)(.+)(?:water-to-light map)");
+        seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:water-to-light map:\n)(.+)(?:light-to-temperature map)");
+        seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:light-to-temperature map:\n)(.+)(?:temperature-to-humidity map)");
+        seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:temperature-to-humidity map:\n)(.+)(?:humidity-to-location map)");
+        seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:humidity-to-location map:\n)(.+)$");
 
-        System.out.println( "Nearest location for given seed numbers: " + Collections.min( transformedSeedValues.values() ) );
+        System.out.print("seed ranges final ");
+        seedRanges.values().forEach( x -> System.out.print( Arrays.toString(x) ));
+        System.out.println();
+        System.out.println("Nearest location for given seed numbers: " + seedRanges.values().stream().map(x -> x[0]).mapToLong(x -> x).min().orElse(0));
     }
 
-//    private static List<Long> craftSeedNumbersList(List<Long> initialValues) {
-//        System.out.println("initialValues: " + initialValues);
-//        List<Long> seedNumbers = new ArrayList<>();
-//
-//        for (int i = 0; i < initialValues.size(); i++) {
-//            if( i%2 == 0 ) {
-//              long start = initialValues.get(i);
-//                long range = initialValues.get(i+1);
-//                LongStream.range( start, start+range ).forEach(seedNumbers::add);
-//            }
-//        }
-//
-//        System.out.println(seedNumbers);
-//        System.out.println("size: " + seedNumbers.size());
-//        return seedNumbers;
-//    }
+    private static Map<Integer, long[]> craftSeedNumbersWithUpperBoundsList(List<Long> initialValues) {
+        Map<Integer, long[]> seedRanges = new HashMap<>();
 
-    public static Map<Integer, Long> computeInputTextAndReturnTransformedValues(Map<Integer, Long> seedValues, String regex){
-        List<Long> seedNumbersAndRange = seedValues.values().stream().toList();
-        return computeInputTextAndReturnTransformedValues(seedNumbersAndRange, regex);
+        int mapKey = 0;
+
+        for (int i = 0; i < initialValues.size(); i++) {
+            if( i%2 == 0 ){
+                long seed = initialValues.get(i);
+                long range = initialValues.get(i+1);
+                seedRanges.put(mapKey++, new long[]{seed, seed + range - 1});
+            }
+        }
+        return seedRanges;
     }
-    public static Map<Integer, Long> computeInputTextAndReturnTransformedValues(List<Long> seedNumbers, String regex ){
 
-        Map<Integer, Long> transformedSeedNumbers = new HashMap<>();
+    public static Map<Integer, long[]> computeInputTextAndReturnTransformedValues( Map<Integer, long[]> seedRanges, String regex ){
+
+        Map<Integer, long[]> transformedSeedNumbers = new HashMap<>();
 
         //extract relevant numbers from puzzle input using given regex - DOTALL flag -> "." also matches newlines
         Pattern pattern = Pattern.compile( regex, Pattern.DOTALL );
@@ -71,38 +67,58 @@ public class Fertilizer2 {
             long destinationStartNumber = currentNumbers.get(0);
             long sourceStartNumber = currentNumbers.get(1);
             long range = currentNumbers.get(2);
+            long sourceEndNumber = sourceStartNumber + range -1;
+            long destinationEndNumber = destinationStartNumber + range -1;
 
-            for (int i = 0; i < seedNumbers.size(); i++) {
+            long modifier = destinationEndNumber - sourceEndNumber;
 
-                long seedNumber = seedNumbers.get(i);
+//            System.out.println(currentNumbers);
+//            System.out.println("sourcestart " + sourceStartNumber + " sourceEnd " + sourceEndNumber + " destinationStart " + destinationStartNumber + " destinationEnd " + destinationEndNumber);
+//            System.out.println(modifier);
 
-                if( seedNumber >= sourceStartNumber && seedNumber < (sourceStartNumber + range) ) {
-                    //compute transformed seed number
-                    //computeIfAbsent -> because no value can be transformed more than onc per step and this protects it from being altered more than once
-                    transformedSeedNumbers.computeIfAbsent(i, x -> destinationStartNumber + ( seedNumber-sourceStartNumber ));
-                }
+            for (int i = 0; i < seedRanges.size(); i++) {
+
+                long[] seedRange = seedRanges.get(i);
+
+                //e.g.: [70, 92]
+                long seedRangeStart = seedRange[0];
+                long seedRangeEnd = seedRange[1];
+
+                //case1: only range start of mapping lies within bounds of given seed range
+                //case2: only range end of mapping lies within bounds of given seed range
+                //case3: both range start lies below AND range end lies above given seed range (given range is completely covered by mapping values) -> easiest case
+                //case4: no mapping needed -> return as is
+
+                /*case3*/ if ( sourceStartNumber < seedRangeStart && sourceEndNumber > seedRangeEnd ){
+
+                    seedRange[0] = seedRangeStart + modifier;
+                    seedRange[1] = seedRangeEnd + modifier;
+                    transformedSeedNumbers.computeIfAbsent(i, x -> seedRange);
+
+                }/*case1*/ else if ( seedRangeStart > sourceStartNumber && seedRangeStart < sourceEndNumber ) {
+
+                    long seedRangeStartNewMapping = seedRangeStart + modifier;
+                    long seedRangeEndNewMapping = 0;
+
+                    seedRange[0] = seedRangeStartNewMapping;
+                    seedRange[1] = seedRangeEndNewMapping;
+                    transformedSeedNumbers.computeIfAbsent(i, x -> seedRange);
+
+                }/*case2*/ else if ( seedRangeEnd > sourceStartNumber  && seedRangeEnd < sourceEndNumber ) {
+
+                    long seedRangeStartNewMapping = 0;
+                    long seedRangeEndNewMapping = seedRangeEnd + modifier;
+
+                    seedRange[0] = seedRangeStartNewMapping;
+                    seedRange[1] = seedRangeEndNewMapping;
+                    transformedSeedNumbers.computeIfAbsent(i, x -> seedRange);
+
+                }/*case4*/ else { transformedSeedNumbers.computeIfAbsent(i, x -> seedRange); }
+
+//                System.out.println(count++);
             }
         }
-//        for ( String numberLine : numberLines ) {
-//            List<Long> currentNumbers = Arrays.stream( numberLine.trim().split(" ") ).map(Long::valueOf).toList();
-//
-//            long destinationStartNumber = currentNumbers.get(0);
-//            long sourceStartNumber = currentNumbers.get(1);
-//            long range = currentNumbers.get(2);
-//
-//            for (int i = 0; i < seedNumbers.size(); i++) {
-//
-//                long seedNumber = seedNumbers.get(i);
-//
-//                if( seedNumber >= sourceStartNumber && seedNumber < (sourceStartNumber + range) ) {
-//                    //compute transformed seed number
-//                    //computeIfAbsent -> because no value can be transformed more than onc per step and this protects it from being altered more than once
-//                    transformedSeedNumbers.computeIfAbsent(i, x -> destinationStartNumber + ( seedNumber-sourceStartNumber ));
-//                }
-//            }
-//        }
 
-        IntStream.range(0, seedNumbers.size() ).forEach( x -> transformedSeedNumbers.computeIfAbsent(x, value -> seedNumbers.get(x) ));
         return transformedSeedNumbers;
     }
     static String testinput = """
