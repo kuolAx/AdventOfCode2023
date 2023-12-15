@@ -15,9 +15,11 @@ public class Fertilizer2 {
         List<Long> seedNumbers = Arrays.stream((testinput.split("\n"))[0].replace("seeds: ", "").trim().split(" ")).map(Long::valueOf).toList();
 
         Map<Integer, long[]> seedRanges = craftSeedNumbersWithUpperBoundsList(seedNumbers);
+//        seedRanges = Map.of(0,new long[]{82,82});
         System.out.println("seed numbers: " + seedNumbers);
         System.out.print("seed ranges: ");
         seedRanges.values().forEach( x -> System.out.print( Arrays.toString(x) ));
+        System.out.println();
 
         seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:seed-to-soil map:\n)(.+)(?:soil-to-fertilizer map)");
         seedRanges = computeInputTextAndReturnTransformedValues(seedRanges, "(?:soil-to-fertilizer map:\\n)(.+)(?:fertilizer-to-water map)");
@@ -48,9 +50,14 @@ public class Fertilizer2 {
         return seedRanges;
     }
 
-    public static Map<Integer, long[]> computeInputTextAndReturnTransformedValues( Map<Integer, long[]> seedRanges, String regex ){
+    public static synchronized Map<Integer, long[]> computeInputTextAndReturnTransformedValues( Map<Integer, long[]> seedRanges, String regex ){
 
-        Map<Integer, long[]> transformedSeedNumbers = new HashMap<>();
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        System.out.println("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
+        Map<Integer, long[]> newRangesMap = new HashMap<>();
+        Map<Integer, long[]> seedRangez = new HashMap<>(seedRanges);
+        int initialSize = seedRangez.size();
+        int count = 0;
 
         //extract relevant numbers from puzzle input using given regex - DOTALL flag -> "." also matches newlines
         Pattern pattern = Pattern.compile( regex, Pattern.DOTALL );
@@ -67,59 +74,74 @@ public class Fertilizer2 {
             long destinationStartNumber = currentNumbers.get(0);
             long sourceStartNumber = currentNumbers.get(1);
             long range = currentNumbers.get(2);
-            long sourceEndNumber = sourceStartNumber + range -1;
-            long destinationEndNumber = destinationStartNumber + range -1;
+            long sourceEndNumber = sourceStartNumber + range - 1;
+            long destinationEndNumber = destinationStartNumber + range - 1;
 
-            long modifier = destinationEndNumber - sourceEndNumber;
+            long modifier = destinationStartNumber - sourceStartNumber;
 
-//            System.out.println(currentNumbers);
-//            System.out.println("sourcestart " + sourceStartNumber + " sourceEnd " + sourceEndNumber + " destinationStart " + destinationStartNumber + " destinationEnd " + destinationEndNumber);
-//            System.out.println(modifier);
-
-            for (int i = 0; i < seedRanges.size(); i++) {
-
-                long[] seedRange = seedRanges.get(i);
-
-                //e.g.: [70, 92]
-                long seedRangeStart = seedRange[0];
-                long seedRangeEnd = seedRange[1];
-
-                //case1: only range start of mapping lies within bounds of given seed range
-                //case2: only range end of mapping lies within bounds of given seed range
-                //case3: both range start lies below AND range end lies above given seed range (given range is completely covered by mapping values) -> easiest case
-                //case4: no mapping needed -> return as is
-
-                /*case3*/ if ( sourceStartNumber < seedRangeStart && sourceEndNumber > seedRangeEnd ){
-
-                    seedRange[0] = seedRangeStart + modifier;
-                    seedRange[1] = seedRangeEnd + modifier;
-                    transformedSeedNumbers.computeIfAbsent(i, x -> seedRange);
-
-                }/*case1*/ else if ( seedRangeStart > sourceStartNumber && seedRangeStart < sourceEndNumber ) {
-
-                    long seedRangeStartNewMapping = seedRangeStart + modifier;
-                    long seedRangeEndNewMapping = 0;
-
-                    seedRange[0] = seedRangeStartNewMapping;
-                    seedRange[1] = seedRangeEndNewMapping;
-                    transformedSeedNumbers.computeIfAbsent(i, x -> seedRange);
-
-                }/*case2*/ else if ( seedRangeEnd > sourceStartNumber  && seedRangeEnd < sourceEndNumber ) {
-
-                    long seedRangeStartNewMapping = 0;
-                    long seedRangeEndNewMapping = seedRangeEnd + modifier;
-
-                    seedRange[0] = seedRangeStartNewMapping;
-                    seedRange[1] = seedRangeEndNewMapping;
-                    transformedSeedNumbers.computeIfAbsent(i, x -> seedRange);
-
-                }/*case4*/ else { transformedSeedNumbers.computeIfAbsent(i, x -> seedRange); }
-
-//                System.out.println(count++);
+            //logging
+            {
+                System.out.print("ranges before transformation: ");
+                seedRangez.values().forEach(x -> System.out.print(Arrays.toString(x)));
+                System.out.println();
+                System.out.print("current numbers: " + currentNumbers);
+                System.out.println(" range: " + sourceStartNumber + "-" + sourceEndNumber + " destination: " + destinationStartNumber + "-" + destinationEndNumber);
+                System.out.println("modifier: " + modifier);
             }
+
+            for (int i = 0; i < initialSize; i++) {
+
+                if ( seedRangez.get(i) != null ) {
+                    long[] seedRange = seedRangez.get(i);
+
+                    //e.g.: [70, 92]
+                    long seedRangeStart = seedRange[0];
+                    long seedRangeEnd = seedRange[1];
+
+                    //generate overlapping range of the two ranges
+                    //e.g.: [transformStartRange, transformEndRange] [60,80] and seedNumbersRange: [70,92] -> overlapRange: [70,80]
+                    long overlapStart   = Math.max( seedRangeStart, sourceStartNumber );
+                    long overlapEnd     = Math.min( seedRangeEnd, sourceEndNumber );
+
+                    boolean overlapExists = overlapStart <= overlapEnd;
+                    System.out.println("overlap: " + overlapStart + " : " + overlapEnd + " -> " + overlapExists);
+
+//                    int newMapKey = newRangesMap.keySet().stream().mapToInt(key -> key).max().orElseGet(() -> 0) + 1;
+                    int initalMapKey = seedRangez.keySet().stream().mapToInt(key -> key).max().orElseGet(() -> 0) + 1;
+
+                    //if overlap exists: create transformed rangeValues for given numbers AND put non overlapping ranges at the back of map
+                    if( overlapExists ){
+
+                        seedRange[0] = overlapStart + modifier;
+                        seedRange[1] = overlapEnd + modifier;
+
+                        newRangesMap.put(i, seedRange);
+                        seedRangez.remove(i);
+
+                        //e.g.: transformRange: [75,80] - seeds: [70,92] - overlapRange: [75,80]
+                        boolean remapBeforeOverlapNeeded = seedRangeStart < overlapStart;
+                        boolean remapAfterOverlapNeeded = seedRangeEnd > overlapEnd;
+
+                        if( remapBeforeOverlapNeeded )
+                            seedRangez.put( initalMapKey, new long[] { seedRangeStart, (overlapStart - 1) } );
+                        if( remapAfterOverlapNeeded ) {
+                            initalMapKey = remapBeforeOverlapNeeded ? initalMapKey + 1  : initalMapKey;
+                            seedRangez.put( initalMapKey, new long[]{ (overlapEnd + 1 ), seedRangeEnd });
+                        }
+    //                    if( sourceStartNumber < seedRangeStart && sourceEndNumber > seedRangeEnd) -> I think its handled above
+                    } else { newRangesMap.put(i, seedRange); }
+                }
+            }
+
+            System.out.print("transformed seed numbers: ");
+            newRangesMap.values().forEach(x -> System.out.print(Arrays.toString(x)));
+            System.out.println();
+            System.out.println("------------------------------------------------------------");
         }
 
-        return transformedSeedNumbers;
+
+
+        return newRangesMap;
     }
     static String testinput = """
             seeds: 79 14 55 13
