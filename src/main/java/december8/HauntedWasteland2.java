@@ -32,6 +32,7 @@ public class HauntedWasteland2 {
             XXX = (XXX, XXX)""";
 
     private static List<String> currentKeys;
+    private static String currentKey;
 
     public static void main(String[] args) {
 
@@ -46,13 +47,39 @@ public class HauntedWasteland2 {
 
         currentKeysSize = currentKeys.size();
 
-        while ( currentKeys.stream().filter( x -> x.endsWith("Z") ).count() != currentKeysSize ) {
-            numberOfSteps = getNumberOfStepsNeeded( numberOfSteps );
-        }
+        List<Long> smallestNumberOfStepsPerStartingNode = new ArrayList<>();
 
-        System.out.println("How many steps are needed to simultaneously end on Z with all paths: " + numberOfSteps);
+        for (String current : currentKeys) {
+            currentKey = current;
+            while ( !currentKey.endsWith("Z") ) {
+                numberOfSteps = getNumberOfStepsNeeded2( numberOfSteps );
+            }
+            smallestNumberOfStepsPerStartingNode.add( (long) numberOfSteps );
+            numberOfSteps = 0;
+        }
+        System.out.println(smallestNumberOfStepsPerStartingNode);
+
+        long lowestCommonMultiple = getLowestCommonMultiple( smallestNumberOfStepsPerStartingNode );
+
+        System.out.println("How many steps are needed to simultaneously end on Z with all paths: " + lowestCommonMultiple);
     }
 
+    public static int getNumberOfStepsNeeded2( int numberOfSteps) {
+        for (char instruction : instructions) {
+
+            if( currentKey.endsWith("Z") )
+                break;
+            if ( instruction == 'R' ){
+                currentKey = elementMap.get(currentKey).get( 1 );
+            } else {
+                currentKey = elementMap.get(currentKey).get( 0 );
+            }
+
+            numberOfSteps++;
+        }
+
+        return numberOfSteps;
+    }
     private static int getNumberOfStepsNeeded( int numberOfSteps) {
         for (char instruction : instructions) {
 
@@ -106,4 +133,45 @@ public class HauntedWasteland2 {
 
         }
     }
+
+
+    //my implementation to find the lowest common multiple:
+    private static long getLowestCommonMultiple(List<Long> smallestNumberOfStepsPerStartingNode) {
+
+        long result = -1;
+
+        for (int i = 0; i < smallestNumberOfStepsPerStartingNode.size()-1; i++) {
+            long a = smallestNumberOfStepsPerStartingNode.get(i);
+            long b = smallestNumberOfStepsPerStartingNode.get(i+1);
+
+            long lcm = getLowestCommonMultiple( a, b );
+            if ( lcm > result | result == -1 )
+                result = lcm;
+        }
+
+        return result;
+    }
+
+    private static long getLowestCommonMultiple(long x, long y){
+
+        long gcd = getGreatestCommonDivisor( x, y );
+
+        //lcm = x*y / gcd
+        return x*y / gcd;
+    }
+
+    private static long getGreatestCommonDivisor(long x, long y){
+
+        if (x == 0 || y == 0) {
+            return x + y;
+        } else {
+            long num1 = Math.abs(x);
+            long num2 = Math.abs(y);
+            long bigNum = Math.max(num1, num2);
+            long smallNum = Math.min(num1, num2);
+            return getGreatestCommonDivisor( bigNum % smallNum, smallNum );
+        }
+    }
 }
+
+
