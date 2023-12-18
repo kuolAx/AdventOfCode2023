@@ -80,34 +80,6 @@ public class HauntedWasteland2 {
 
         return numberOfSteps;
     }
-    private static int getNumberOfStepsNeeded( int numberOfSteps) {
-        for (char instruction : instructions) {
-
-            numberOfSteps++;
-
-            //do for each path
-            for (int i = 0; i < currentKeysSize; i++) {
-                String currentKey = currentKeys.get(i);
-
-                String nodeLeftEntry = elementMap.get(currentKey).get( 0 );
-                String nodeRightEntry = elementMap.get(currentKey).get( 1 );
-
-                if ( instruction == 'R' ){
-                    currentKeys.set( i, nodeRightEntry );
-                } else {
-                    currentKeys.set( i, nodeLeftEntry );
-                }
-            }
-
-            if ( currentKeys.stream().filter( x -> x.endsWith("Z") ).count() == currentKeysSize ) {
-                return numberOfSteps;
-            }
-        }
-
-        System.out.println(currentKeys.stream().filter( x -> x.endsWith("Z") ).count());
-
-        return numberOfSteps;
-    }
 
     private static List<String> getStartingNodes() {
         //using Collectors with specified ArrayList to retrieve a mutable List
@@ -138,26 +110,37 @@ public class HauntedWasteland2 {
     //my implementation to find the lowest common multiple:
     private static long getLowestCommonMultiple(List<Long> smallestNumberOfStepsPerStartingNode) {
 
-        long result = -1;
+        int listSize = smallestNumberOfStepsPerStartingNode.size();
 
-        for (int i = 0; i < smallestNumberOfStepsPerStartingNode.size()-1; i++) {
-            long a = smallestNumberOfStepsPerStartingNode.get(i);
-            long b = smallestNumberOfStepsPerStartingNode.get(i+1);
+        for (int j = 0; j < listSize; j++) {
 
-            long lcm = getLowestCommonMultiple( a, b );
-            if ( lcm > result | result == -1 )
-                result = lcm;
+            Map<Integer, Long> lcms = new HashMap<>();
+
+            for (int i = 1; i < listSize - j; i++) {
+                long a = Math.abs( smallestNumberOfStepsPerStartingNode.get( j ) );
+                long b = Math.abs( smallestNumberOfStepsPerStartingNode.get( j+i ) );
+
+                long lcm = getLowestCommonMultiple( a, b );
+
+                lcms.put( i, lcm );
+                System.out.println(lcms);
+            }
+
+            if ( lcms.size() > 1 )
+                return getLowestCommonMultiple( lcms.values().stream().toList() );
+
         }
 
-        return result;
+        return 0;
     }
 
     private static long getLowestCommonMultiple(long x, long y){
 
+        //greatest common divisor
         long gcd = getGreatestCommonDivisor( x, y );
 
-        //lcm = x*y / gcd
-        return x*y / gcd;
+        //lowest common multiple = x * y / gcd
+        return x * y / gcd;
     }
 
     private static long getGreatestCommonDivisor(long x, long y){
