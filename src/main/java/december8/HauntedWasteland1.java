@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class HauntedWasteland1 {
     private static final Pattern MATCH_WORD_CHARACTERS = Pattern.compile("(\\w+)");
@@ -16,23 +15,6 @@ public class HauntedWasteland1 {
     //Map<String, List<String>> - { Instruction, [L-Instruction, R-Instruction] }
     private static final Map<String, List<String>> elementMap = new HashMap<>();
     private static char[] instructions;
-
-    static String testInput = """
-            RL
-                        
-            AAA = (BBB, CCC)
-            BBB = (DDD, EEE)
-            CCC = (ZZZ, GGG)
-            DDD = (DDD, DDD)
-            EEE = (EEE, EEE)
-            GGG = (GGG, GGG)
-            ZZZ = (ZZZ, ZZZ)""";
-    static String testInput2 = """
-            LLR
-                        
-            AAA = (BBB, BBB)
-            BBB = (AAA, ZZZ)
-            ZZZ = (ZZZ, ZZZ)""";
     private static String currentKey;
 
 
