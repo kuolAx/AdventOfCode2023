@@ -49,10 +49,11 @@ public class HauntedWasteland2 {
 
         List<Long> smallestNumberOfStepsPerStartingNode = new ArrayList<>();
 
+        //collect smallest number of steps needed per starting node to reach a finishing node in list
         for (String current : currentKeys) {
             currentKey = current;
             while ( !currentKey.endsWith("Z") ) {
-                numberOfSteps = getNumberOfStepsNeeded2( numberOfSteps );
+                numberOfSteps = getNumberOfStepsNeeded( numberOfSteps );
             }
             smallestNumberOfStepsPerStartingNode.add( (long) numberOfSteps );
             numberOfSteps = 0;
@@ -64,7 +65,7 @@ public class HauntedWasteland2 {
         System.out.println("How many steps are needed to simultaneously end on Z with all paths: " + lowestCommonMultiple);
     }
 
-    public static int getNumberOfStepsNeeded2( int numberOfSteps) {
+    public static int getNumberOfStepsNeeded(int numberOfSteps) {
         for (char instruction : instructions) {
 
             if( currentKey.endsWith("Z") )

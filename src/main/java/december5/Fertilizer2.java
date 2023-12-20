@@ -15,7 +15,7 @@ public class Fertilizer2 {
         List<Long> seedNumbers = Arrays.stream((content.split("\n"))[0].replace("seeds: ", "").trim().split(" ")).map(Long::valueOf).toList();
 
         Map<Integer, long[]> seedRanges = craftSeedNumbersWithUpperBoundsList(seedNumbers);
-//        seedRanges = Map.of(0,new long[]{82,82});
+
         System.out.println("seed numbers: " + seedNumbers);
         System.out.print("seed ranges: ");
         seedRanges.values().forEach( x -> System.out.print( Arrays.toString(x) ));
