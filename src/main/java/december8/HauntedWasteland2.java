@@ -13,25 +13,8 @@ import java.util.stream.Collectors;
 
 public class HauntedWasteland2 {
     private static final Pattern MATCH_WORD_CHARACTERS = Pattern.compile("(\\w+)");
-
-    //Map<String, List<String>> - { Instruction, [L-Instruction, R-Instruction] }
-    private static final Map<String, List<String>> elementMap = new HashMap<>();
-    private static char[] instructions;
-    private static int currentKeysSize;
-    private static int numberOfSteps = 0;
-    static String testInput = """
-            LR
-                        
-            11A = (11B, XXX)
-            11B = (XXX, 11Z)
-            11Z = (11B, XXX)
-            22A = (22B, XXX)
-            22B = (22C, 22C)
-            22C = (22Z, 22Z)
-            22Z = (22B, 22B)
-            XXX = (XXX, XXX)""";
-
-    private static List<String> currentKeys;
+    private static final Map<String, List<String>> elementMap = new HashMap<>(); //Map<String, List<String>> - { NodeName, [L-Instruction, R-Instruction] }
+    private static char[] instructions; //char array of "RLLLRLLRRLR...."
     private static String currentKey;
 
     public static void main(String[] args) {
@@ -39,47 +22,55 @@ public class HauntedWasteland2 {
         String content = AdventHelper.readFile("./src/main/java/december8/input.txt");
         extractInstructionsAndElementsMap( content );
 
-        System.out.println( instructions );
-        System.out.println( elementMap );
+        System.out.println( "instructions created - length: " + instructions.length );
+        System.out.println( "element-map created" );
 
-        currentKeys = getStartingNodes();
-        System.out.println("initial Starting Keys: " + currentKeys);
+        List<String> startingKeysList = getStartingNodes();
+        System.out.println("initial Starting Keys: " + startingKeysList);
 
-        currentKeysSize = currentKeys.size();
+        List<Long> toZStepsList = new ArrayList<>();
 
-        List<Long> smallestNumberOfStepsPerStartingNode = new ArrayList<>();
+        for (String startNode : startingKeysList) {
 
-        //collect smallest number of steps needed per starting node to reach a finishing node in list
-        for (String current : currentKeys) {
-            currentKey = current;
-            while ( !currentKey.endsWith("Z") ) {
-                numberOfSteps = getNumberOfStepsNeeded( numberOfSteps );
+            String tempKey = startNode;
+            setCurrentKey( tempKey );
+            long numberOfSteps = 0;
+
+            while ( !getCurrentKey().endsWith("Z") ) {
+                List<Object> results = getNumberOfStepsNeeded(numberOfSteps );
+
+                tempKey             = (String) results.get(0);
+                numberOfSteps       = (long) results.get(1);
             }
-            smallestNumberOfStepsPerStartingNode.add( (long) numberOfSteps );
-            numberOfSteps = 0;
+
+            if( tempKey.endsWith("Z") ) {
+                toZStepsList.add( numberOfSteps );
+            }
         }
-        System.out.println(smallestNumberOfStepsPerStartingNode);
 
-        long lowestCommonMultiple = getLowestCommonMultiple( smallestNumberOfStepsPerStartingNode );
-
-        System.out.println("How many steps are needed to simultaneously end on Z with all paths: " + lowestCommonMultiple);
+        System.out.println( "number of steps needed per starting node: " + toZStepsList );
+        long lowestCommonMultiple = lcm( toZStepsList );
+        System.out.println("lowest common multiple of all steps needed: " + lowestCommonMultiple);
     }
 
-    public static int getNumberOfStepsNeeded(int numberOfSteps) {
+    public static List<Object> getNumberOfStepsNeeded( long numberOfSteps ) {
+
         for (char instruction : instructions) {
 
-            if( currentKey.endsWith("Z") )
-                break;
-            if ( instruction == 'R' ){
-                currentKey = elementMap.get(currentKey).get( 1 );
+            //set currentKey to the next value depending on the instruction 'R' or 'L'
+            if ( instruction == 'R' ) {
+                setCurrentKey( elementMap.get( getCurrentKey() ).get(1) );
             } else {
-                currentKey = elementMap.get(currentKey).get( 0 );
+                setCurrentKey( elementMap.get( getCurrentKey() ).get(0) );
             }
-
             numberOfSteps++;
+
+            if ( getCurrentKey().endsWith("Z") ) {
+                return List.of( getCurrentKey(), numberOfSteps );
+            }
         }
 
-        return numberOfSteps;
+        return List.of( getCurrentKey(), numberOfSteps );
     }
 
     private static List<String> getStartingNodes() {
@@ -96,65 +87,37 @@ public class HauntedWasteland2 {
             Matcher matchWordCharacters = MATCH_WORD_CHARACTERS.matcher(contentLine);
 
             if ( i != 0 && i != 1 ) {
-                List<String> matchesList = matchWordCharacters.results().map(MatchResult::group).toList();
+                List<String> matchesList = matchWordCharacters.results().map(MatchResult::group).map(String::trim).toList();
                 elementMap.put( matchesList.get(0), List.of( matchesList.get(1), matchesList.get(2) ) );
             } else {
                 while(matchWordCharacters.find()) {
                     instructions = matchWordCharacters.group().toCharArray();
                 }
             }
-
         }
     }
 
-
-    //my implementation to find the lowest common multiple:
-    private static long getLowestCommonMultiple(List<Long> smallestNumberOfStepsPerStartingNode) {
-
-        int listSize = smallestNumberOfStepsPerStartingNode.size();
-
-        for (int j = 0; j < listSize; j++) {
-
-            Map<Integer, Long> lcms = new HashMap<>();
-
-            for (int i = 1; i < listSize - j; i++) {
-                long a = Math.abs( smallestNumberOfStepsPerStartingNode.get( j ) );
-                long b = Math.abs( smallestNumberOfStepsPerStartingNode.get( j+i ) );
-
-                long lcm = getLowestCommonMultiple( a, b );
-
-                lcms.put( i, lcm );
-                System.out.println(lcms);
-            }
-
-            if ( lcms.size() > 1 )
-                return getLowestCommonMultiple( lcms.values().stream().toList() );
-
-        }
-
-        return 0;
+    //greatestCommonDivisor
+    static long gcd(long a, long b)
+    {
+        if (b == 0)
+            return a;
+        return gcd(b, a % b);
     }
 
-    private static long getLowestCommonMultiple(long x, long y){
-
-        //greatest common divisor
-        long gcd = getGreatestCommonDivisor( x, y );
-
-        //lowest common multiple = x * y / gcd
-        return x * y / gcd;
+    //lowestCommonMultiple
+    static long lcm(List<Long> numbers)
+    {
+        return numbers.stream().reduce(
+                1L, (x, y) -> (x * y) / gcd(x, y) );
     }
 
-    private static long getGreatestCommonDivisor(long x, long y){
+    public static String getCurrentKey() {
+        return currentKey;
+    }
 
-        if (x == 0 || y == 0) {
-            return x + y;
-        } else {
-            long num1 = Math.abs(x);
-            long num2 = Math.abs(y);
-            long bigNum = Math.max(num1, num2);
-            long smallNum = Math.min(num1, num2);
-            return getGreatestCommonDivisor( bigNum % smallNum, smallNum );
-        }
+    public static void setCurrentKey(String currentKey) {
+        HauntedWasteland2.currentKey = currentKey;
     }
 }
 
