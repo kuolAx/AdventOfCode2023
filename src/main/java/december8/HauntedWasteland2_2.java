@@ -30,16 +30,16 @@ public class HauntedWasteland2_2 {
         String content = AdventHelper.readFile("./src/main/java/december8/input.txt");
         extractInstructionsAndElementsMap( content );
 
-        System.out.println( instructions );
-        System.out.println( elementMap );
+        System.out.println( "instructions created" );
+        System.out.println( "element-map created" );
 
         startingKeysList = getStartingNodes();
         System.out.println("initial Starting Keys: " + startingKeysList);
 
         startingKeysSize = startingKeysList.size();
 
+        System.out.println("stepsToEndOnZ Lists: ");
         List<List<Long>> toZStepsLists = new ArrayList<>();
-
         for (String startNode : startingKeysList) {
 
             String tempKey = startNode;
@@ -60,7 +60,12 @@ public class HauntedWasteland2_2 {
 
                 if( tempKey.endsWith("Z") ) {
                     stepsUntilZList.add( numberOfSteps );
-                    currentKey = elementMap.get(currentKey).get(1);
+
+                    if ( instructions[instructionIndex] == 'R' ) {
+                        currentKey = elementMap.get( currentKey ).get(1);
+                    } else {
+                        currentKey = elementMap.get( currentKey ).get(0);
+                    }
                 }
             }
 
@@ -87,14 +92,18 @@ public class HauntedWasteland2_2 {
 
         String tempKey = null;
 
+        if( instructionIndex != 0) {
+            System.out.println(currentKey + " " + instructionIndex);
+        }
+
         for ( int i = instructionIndex; i < instructions.length; i++) {
             char instruction = instructions[i];
-            boolean flag = false;
 
-            if ( currentKey.endsWith("Z") ) {
-                tempKey = "" + currentKey;
-                flag = true;
-                System.out.println("Key after Z -> " + currentKey);
+            tempKey = "" + currentKey;
+
+            //never executed??
+            if ( tempKey.endsWith("Z") ) {
+                return List.of( tempKey, numberOfSteps, i );
             }
 
             //set currentKey to the next value depending on the instruction 'R' or 'L'
@@ -105,14 +114,10 @@ public class HauntedWasteland2_2 {
             }
 
             numberOfSteps++;
-
-            if ( flag ) {
-                System.out.println("Key after Z -> " + currentKey);
-                return List.of( tempKey, numberOfSteps, i );
-            }
         }
 
-        return List.of( currentKey, numberOfSteps, 0 );
+        tempKey = "" + currentKey;
+        return List.of( tempKey, numberOfSteps, 0 );
     }
 
     private static List<String> getStartingNodes() {
