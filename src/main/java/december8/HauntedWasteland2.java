@@ -98,18 +98,15 @@ public class HauntedWasteland2 {
     }
 
     //greatestCommonDivisor
-    static long gcd(long a, long b)
-    {
+    static long gcd(long a, long b) {
         if (b == 0)
             return a;
         return gcd(b, a % b);
     }
 
     //lowestCommonMultiple
-    static long lcm(List<Long> numbers)
-    {
-        return numbers.stream().reduce(
-                1L, (x, y) -> (x * y) / gcd(x, y) );
+    static long lcm(List<Long> numbers) {
+        return numbers.stream().reduce(1L, (x, y) -> (x * y) / gcd(x, y) );
     }
 
     public static String getCurrentKey() {
