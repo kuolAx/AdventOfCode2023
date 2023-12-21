@@ -14,7 +14,6 @@ public class MirageMaintenance1 {
     public static void main(String[] args) {
 
         String[] contentLines = AdventHelper.readFile("./src/main/java/december9/input.txt").split("\n");
-//        String[] contentLines = testInput.split("\n");
 
         List<List<Integer>> sensorHistories = getSensorHistories( contentLines );
         List<Integer> extrapolatedSensorValues = new ArrayList<>();

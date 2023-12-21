@@ -3,23 +3,20 @@ package december9;
 import utils.AdventHelper;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+//almost identical to part1 -> just reversed the lists before computing new history entry
 public class MirageMaintenance2 {
     private static final Pattern MATCH_NUMBERS = Pattern.compile("(-*\\d+)");
-
-    static String testInput = """
-            0 3 6 9 12 15
-            1 3 6 10 15 21
-            10 13 16 21 30 45""";
     public static void main(String[] args) {
 
         String[] contentLines = AdventHelper.readFile("./src/main/java/december9/input.txt").split("\n");
-//        String[] contentLines = testInput.split("\n");
 
         List<List<Integer>> sensorHistories = getSensorHistories( contentLines );
         List<Integer> extrapolatedSensorValues = new ArrayList<>();
@@ -33,23 +30,6 @@ public class MirageMaintenance2 {
                 System.out.println("exception history: " + history);
             }
         }
-
-        //debug to find error -> i did not include "-" before unmbers to get negative values...
-//        List<Integer> history = List.of(12, 12, 11, 5, -5, -5, 40, 194, 558, 1278, 2553, 4643, 7877, 12661, 19486, 28936, 41696, 58560, 80439, 108369, 143519);
-//        final List<Integer> differences = new ArrayList<>(history);
-//        System.out.println(differences);
-//
-//        for (int j = 0; j < history.size(); j++) {
-//            ArrayList<Integer> diff = new ArrayList<>();
-//            IntStream
-//                    .range( 0, differences.size()-1 )
-//                    .forEach( i -> diff.add( differences.get(i+1) - differences.get(i) ) );
-//
-//            differences.clear();
-//            differences.addAll(diff);
-//            System.out.println(diff);
-//        }
-
 
         System.out.println( extrapolatedSensorValues );
         System.out.println("sum of extrapolated values: " + extrapolatedSensorValues.stream().reduce(0, Integer::sum));
@@ -81,7 +61,9 @@ public class MirageMaintenance2 {
 
             Matcher matchNumbers = MATCH_NUMBERS.matcher(contentLine);
 
-            List<Integer> sensorHistory = matchNumbers.results().map(MatchResult::group).map(Integer::valueOf).toList();
+            List<Integer> sensorHistory = matchNumbers.results().map(MatchResult::group).map(Integer::valueOf).collect(Collectors.toList());
+
+            Collections.reverse(sensorHistory);
             sensorHistories.add(sensorHistory);
         }
 
