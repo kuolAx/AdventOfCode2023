@@ -2,7 +2,6 @@ package december25;
 
 import utils.AdventHelper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +45,7 @@ public class Snowverload1 {
             components.put(splitLine[0], connectedNodes);
         }
 
+        //implement Dijkstra
 
 
     }
