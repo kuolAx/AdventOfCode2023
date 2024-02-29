@@ -29,8 +29,7 @@ public class CubeConundrum2 {
                                                             });
 
         //sum each sublist and get power
-        int power = 0;
-        power = minCubesPerGame.stream().map( x -> x.get(0) * x.get(1) * x.get(2) ).reduce(0, Integer::sum);
+        int power = minCubesPerGame.stream().map( x -> x.get(0) * x.get(1) * x.get(2) ).reduce(0, Integer::sum);
         System.out.println("Power of all games combined: " + power);
     }
 
@@ -52,14 +51,8 @@ public class CubeConundrum2 {
     }
 
     private static Integer getMaxValueOfColor(List<Integer> colorNumbersList) {
-        Integer maxCubesNeeded = 0;
 
-        for (Integer ncurrentNmberOfColor : colorNumbersList) {
-            if (ncurrentNmberOfColor > maxCubesNeeded) {
-                maxCubesNeeded = ncurrentNmberOfColor;
-            }
-        }
-        return maxCubesNeeded;
+        return colorNumbersList.stream().mapToInt(x -> x).reduce(0, Integer::max);
     }
 
 }
